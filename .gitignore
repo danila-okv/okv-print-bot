@@ -1,0 +1,9 @@
+.DS_Store
+logs
+__pycache__
+data/tmp
+data/uploads
+data/ledger.xlsx
+db.py
+run.command
+.env

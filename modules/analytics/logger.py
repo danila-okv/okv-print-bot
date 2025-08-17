@@ -3,18 +3,21 @@ import os
 import logging
 from logging import LoggerAdapter
 from datetime import datetime
-from config import LOG_DIR
+from config import LOG_DIR, LOG_DIR_STR, LOG_TO_CONSOLE
 
-# Убедимся, что папка для логов существует
+# Ensure the log directory exists (config.py should already do this, but
+# performing it here makes the module self‑sufficient if imported alone).
 os.makedirs(LOG_DIR, exist_ok=True)
 date_str = datetime.now().strftime("%Y-%m-%d")
-LOG_PATH = os.path.join(LOG_DIR, f"{date_str}.log")
+# Compose the path to today's log file.  Convert Path to string because
+# logging API expects simple strings for file names.
+LOG_PATH = os.path.join(LOG_DIR_STR, f"{date_str}.log")
 
 # Базовый логгер
 _base_logger = logging.getLogger("printer_bot")
 _base_logger.setLevel(logging.DEBUG)
 
-# Файловый хэндлер
+# File handler writes all log records to the daily log file.
 file_handler = logging.FileHandler(LOG_PATH, encoding="utf-8")
 file_handler.setLevel(logging.DEBUG)
 
@@ -25,6 +28,16 @@ formatter = logging.Formatter(
 )
 file_handler.setFormatter(formatter)
 _base_logger.addHandler(file_handler)
+
+# Optionally add a console handler.  When LOG_TO_CONSOLE is True, messages
+# will be printed to stdout in the same format as the file handler.  This
+# is useful during development but can be disabled in production to
+# prevent noisy output.
+if LOG_TO_CONSOLE:
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(formatter)
+    _base_logger.addHandler(console_handler)
 
 # Обёртка, которая добавляет поля user_id и handler в каждый рекорд
 class _ContextAdapter(LoggerAdapter):

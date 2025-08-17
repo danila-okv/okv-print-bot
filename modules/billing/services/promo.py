@@ -52,6 +52,8 @@ def get_user_bonus_pages(user_id: int) -> int:
         ).fetchone()
     return row["bonus_pages"] if row else 0
 
+from config import DISCOUNT_PERCENT
+
 def get_user_discounts(user_id: int) -> tuple[int, float, str]:
     # бонусы из таблицы
     bonus = get_user_bonus_pages(user_id)
@@ -72,6 +74,13 @@ def get_user_discounts(user_id: int) -> tuple[int, float, str]:
 
     discount_percent = float(best_disc[0])
     used_code = best_disc[1] or best_pages[1]
+    # Apply default discount from configuration if greater than existing discount
+    try:
+        if DISCOUNT_PERCENT > discount_percent:
+            discount_percent = DISCOUNT_PERCENT
+    except Exception:
+        # If config import fails or attribute missing, ignore and use current value
+        pass
     return total_bonus_pages, discount_percent, used_code
 
 

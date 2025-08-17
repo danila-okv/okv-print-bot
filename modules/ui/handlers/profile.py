@@ -176,7 +176,9 @@ async def handle_profile(callback: CallbackQuery) -> None:
                 expiry_str = ""
         else:
             # No duration specified — treat as perpetual
-            expiry_str = "навсегда"
+            expiry_str = ""
+        if "GIFT" in code:
+            code="Подарок"
 
         if reward_type == "pages":
             reward_text = f"{int(reward_value)} стр."
@@ -186,15 +188,18 @@ async def handle_profile(callback: CallbackQuery) -> None:
         if expiry_str:
             promo_lines.append(f"• <b>{code}</b>: {reward_text}, до {expiry_str}")
         else:
-            promo_lines.append(f"• <b>{code}</b>: {reward_text}")
+            promo_lines.append(f"• <b>{code}</b>: {reward_text}, навсегда")
 
     promos_block = "\n".join(promo_lines) if promo_lines else "Нет"
+
+    bonus_line = f"🎁 Бесплатных страниц: <b>{bonus_pages}</b>\n" if bonus_pages > 0 else ""
+    promo_line = f"🎟 <b>Активные промокоды:</b>\n{promos_block}" if promo_lines else ""
 
     profile_text = (
         "👤 <b>Твой профиль</b>\n\n"
         f"📄 Напечатано страниц: <b>{total_pages}</b>\n"
-        f"🎁 Осталось бонусных страниц: <b>{bonus_pages}</b>\n\n"
-        f"🎟 <b>Активные промокоды:</b>\n{promos_block}"
+        f"{bonus_line}\n"
+        f"{promo_line}"
     )
 
     await send_managed_message(

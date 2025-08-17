@@ -1,5 +1,6 @@
 from typing import Optional
 from utils.parsers import extract_pages
+from config import PRICE_PER_PAGE
 
 def calculate_price(
     page_range: str,
@@ -14,7 +15,8 @@ def calculate_price(
     pages_covered_by_bonus = min(bonus_pages, total_pages)
     pages_to_pay = total_pages - pages_covered_by_bonus
 
-    price_per_page = 0.20
+    # Use configured price per page
+    price_per_page = PRICE_PER_PAGE
     raw_price = pages_to_pay * price_per_page
     discounted_price = raw_price * (1 - discount_percent / 100)
 

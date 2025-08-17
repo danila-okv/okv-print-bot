@@ -2,6 +2,10 @@
 
 from db import get_connection
 from typing import Optional, List, Dict
+from pathlib import Path
+import shutil
+from datetime import datetime
+from config import DB_PATH, BACKUP_PATH
 
 PAUSE_KEY = 'paused'
 
@@ -57,3 +61,18 @@ def pop_all_queued_actions() -> List[Dict]:
         conn.execute("DELETE FROM paused_actions;")
         conn.commit()
     return rows
+
+
+def backup_database() -> Path:
+    """
+    Create a backup copy of the SQLite database in the configured backup directory.
+
+    The backup file is named using the current timestamp to avoid collisions.
+    Returns the Path to the created backup file.
+    """
+    # Ensure the backup directory exists (should already be created by config)
+    BACKUP_PATH.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dest = BACKUP_PATH / f"bot_backup_{timestamp}.db"
+    shutil.copy2(DB_PATH, dest)
+    return dest

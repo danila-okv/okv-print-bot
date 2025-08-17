@@ -2,6 +2,7 @@
 logs
 __pycache__
 data/tmp
+backups
 data/uploads
 data/ledger.xlsx
 db.py

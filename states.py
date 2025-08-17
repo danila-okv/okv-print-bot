@@ -38,13 +38,23 @@ class PromoStates(StatesGroup):
 class GiftStates(StatesGroup):
     """
     Состояния для команды /gift, позволяющей администратору выдать пользователю
-    либо бесплатные страницы, либо скидку. Порядок состояний:
+    либо бесплатные страницы, либо скидку. В расширенной версии бот также
+    поддерживает массовую выдачу подарков: при вызове команды /gift без
+    указания ID бот попросит ввести список пользовательских идентификаторов.
+    Порядок состояний:
 
-    1. choosing_type – выбор типа подарка (страницы или скидка).
-    2. entering_value – ввод количества страниц либо размера скидки.
-    3. notify_choice – запрос, следует ли уведомить пользователя.
-    4. entering_message – ввод текста уведомления для пользователя.
+    1. entering_users – ввод списка пользователей, которым будет выдан подарок (используется,
+       когда команда /gift вызвана без параметров).
+    2. choosing_type – выбор типа подарка (страницы или скидка).
+    3. entering_value – ввод количества страниц либо размера скидки.
+    4. notify_choice – запрос, следует ли уведомить пользователя(ей).
+    5. entering_message – ввод текста уведомления для пользователя(ей).
+
+    The extra ``entering_users`` state allows an administrator to enter a comma‑ or newline‑separated
+    list of user IDs. When the ``/gift`` command is invoked without specifying a user ID,
+    the bot will switch to this state and wait for the admin to provide the list.
     """
+    entering_users = State()
     choosing_type = State()
     entering_value = State()
     notify_choice = State()

@@ -108,6 +108,49 @@ DEBUG_PRICE: float = 0.80
 LOG_TO_CONSOLE: bool = False
 
 ###############################################################################
+# Printing queue configuration
+###############################################################################
+
+# Estimated time in seconds that it takes the printer to output a single page.
+# This value is used to predict how long a job will spend in the queue and
+# therefore how long a user may need to wait.  Adjust this based on the
+# actual throughput of your printer.  For example, if your printer can
+# reliably produce about 12 pages per minute, set this value to 5.0 (seconds).
+QUEUE_TIME_PER_PAGE: float = 5.0
+
+# Fixed overhead in seconds before a job begins printing.  This accounts for
+# warm‑up time, spooling and any mechanical delays prior to the first page
+# being produced.  It is added once per job when calculating the expected
+# duration.  Increase this if your printer takes a long time to start
+# printing after receiving data.
+QUEUE_WARMUP_TIME: float = 10.0
+
+# How frequently (in seconds) the bot should refresh the estimated wait
+# times for queued print jobs.  When users are waiting in the queue, their
+# status messages can be automatically updated at this interval to reflect
+# progress.  Lower values result in more frequent updates but may increase
+# message editing load.
+QUEUE_STATUS_UPDATE_INTERVAL: float = 30.0
+
+# Personal discount tiers define how many pages a user must print to unlock a
+# percentage discount on future print jobs.  The keys represent the
+# cumulative number of pages a user has printed (counting duplicates when
+# multiple copies are produced), and the values represent the discount
+# percentage that will be applied once that threshold has been reached.
+# Tiers should be defined in ascending order; the bot will always apply
+# the highest tier that the user qualifies for.  For example:
+#     {100: 5.0, 300: 10.0, 600: 15.0}
+# means that users receive a 5% discount after printing 100 pages in total,
+# 10% after 300 pages, and 15% after 600 pages.  You can adjust the
+# thresholds and percentages to suit your use case.  An empty dict disables
+# the personal discount feature.
+PERSONAL_DISCOUNT_TIERS: dict[int, float] = {
+    100: 5.0,
+    300: 10.0,
+    600: 15.0,
+}
+
+###############################################################################
 # User and job limits / promotional settings
 ###############################################################################
 
@@ -182,6 +225,10 @@ __all__ = [
     "LOG_TO_CONSOLE",
     "FREE_PAGES_ON_REGISTER",
     "DISCOUNT_PERCENT",
+    "QUEUE_TIME_PER_PAGE",
+    "QUEUE_WARMUP_TIME",
+    "QUEUE_STATUS_UPDATE_INTERVAL",
+    "PERSONAL_DISCOUNT_TIERS",
     "ALLOWED_FILE_TYPES",
     "MAX_FILE_SIZE_MB",
     "MAX_PAGES_PER_JOB",

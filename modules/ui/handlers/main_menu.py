@@ -51,7 +51,9 @@ async def start_command(message: Message, state: FSMContext):
 # Handle Main menu callback
 @router.callback_query(F.data == MAIN_MENU)
 async def handle_main_menu(callback: CallbackQuery):
-    await callback.message.answer(
+    await send_managed_message(
+        bot=callback.bot,
+        user_id=callback.from_user.id,
         text=MAIN_MENU_TEXT,
         reply_markup=main_menu_kb
     )
@@ -61,7 +63,7 @@ async def handle_main_menu(callback: CallbackQuery):
         msg="Send main menu"
     )
 
-async def send_main_menu(bot: Bot, user_id: int, total_pages: int = 0):
+async def send_main_menu(bot: Bot, user_id: int):
     await send_managed_message(
         bot=bot,
         user_id=user_id,

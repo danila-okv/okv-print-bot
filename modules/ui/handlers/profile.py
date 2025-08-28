@@ -1,16 +1,3 @@
-"""
-Handlers responsible for user profile and order history.
-
-This module defines callbacks for displaying a summary of the user's
-printing activity (total pages printed, remaining bonus pages, and active
-promo codes) as well as a paginated view of their past print orders.
-
-The profile view is accessed via the "👤 Профиль" button on the main menu.
-History is navigated with inline keyboard buttons that encode the page
-number in the callback data (e.g. ``orders:2`` for the second page). Use
-the ``ORDERS`` callback constant to reference the first page.
-"""
-
 from __future__ import annotations
 
 from aiogram import Router, F
@@ -143,6 +130,7 @@ def _build_orders_kb(page: int, total_items: int, per_page: int) -> InlineKeyboa
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
+
 @router.callback_query(F.data == PROFILE)
 async def handle_profile(callback: CallbackQuery) -> None:
     """Show user's profile summary when the profile button is pressed."""
@@ -150,6 +138,49 @@ async def handle_profile(callback: CallbackQuery) -> None:
 
     total_pages = _calculate_user_total_pages(user_id)
     bonus_pages = get_user_bonus_pages(user_id)
+
+    # Personal discount and progress calculation
+    # Import tiers lazily to avoid circular dependencies
+    from config import PERSONAL_DISCOUNT_TIERS
+    # Determine current and next discount thresholds
+    sorted_tiers = sorted(PERSONAL_DISCOUNT_TIERS.items()) if PERSONAL_DISCOUNT_TIERS else []
+    current_discount: float = 0.0
+    prev_threshold: int = 0
+    next_threshold: int | None = None
+    next_discount: float | None = None
+    for threshold, discount in sorted_tiers:
+        if total_pages >= threshold:
+            current_discount = discount
+            prev_threshold = threshold
+        else:
+            next_threshold = threshold
+            next_discount = discount
+            break
+    pages_to_next = (next_threshold - total_pages) if next_threshold is not None else None
+    # Build progress bar across the current tier (or filled if no next tier)
+    if next_threshold is not None and next_threshold > prev_threshold:
+        progress_ratio = (total_pages - prev_threshold) / (next_threshold - prev_threshold)
+    else:
+        progress_ratio = 1.0
+    bar_length = 14
+    filled_segments = int(progress_ratio * bar_length)
+    if filled_segments > bar_length:
+        filled_segments = bar_length
+    bar = "".join(["█" if i < filled_segments else "-" for i in range(bar_length)])
+    # Compose discount block lines
+    discount_lines: list[str] = []
+    # Always display current discount tier (0 if none reached)
+    discount_lines.append(f"💸 Личная скидка: <b>{int(current_discount)}</b>%")
+    if next_threshold is not None and next_discount is not None:
+        discount_lines.append(
+            f"🚀 До скидки <b>{int(next_discount)}</b>% осталось <b>{pages_to_next}</b> стр."
+        )
+    elif sorted_tiers:
+        # User has reached the highest tier if tiers are defined
+        discount_lines.append("🎉 Ты достиг максимальной скидки!")
+    # Append visual progress bar
+    discount_lines.append(f"Прогресс: <code>[{bar}]</code>")
+    discount_block = "\n".join(discount_lines)
 
     # Collect active promos and format them
     promos = get_active_promos_for_user(user_id)
@@ -199,7 +230,8 @@ async def handle_profile(callback: CallbackQuery) -> None:
         "👤 <b>Твой профиль</b>\n\n"
         f"📄 Напечатано страниц: <b>{total_pages}</b>\n"
         f"{bonus_line}\n"
-        f"{promo_line}"
+        f"{promo_line}\n\n"
+        f"{discount_block}"
     )
 
     await send_managed_message(

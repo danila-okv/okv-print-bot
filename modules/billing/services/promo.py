@@ -52,7 +52,63 @@ def get_user_bonus_pages(user_id: int) -> int:
         ).fetchone()
     return row["bonus_pages"] if row else 0
 
-from config import DISCOUNT_PERCENT
+from config import DISCOUNT_PERCENT, PERSONAL_DISCOUNT_TIERS
+from utils.parsers import extract_pages
+
+# Helper functions for personal discount calculation
+def _calculate_user_total_pages_for_discount(user_id: int) -> int:
+    """
+    Compute the total number of pages a user has printed across all completed
+    jobs.  This replicates the logic in the profile handler but is kept here
+    to avoid circular imports and so that the discount engine can be
+    self‑contained.  Pages are multiplied by the number of copies.  If a
+    custom page range was selected for a job, only those pages are counted.
+    """
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT page_count, pages, copies
+            FROM print_jobs
+            WHERE user_id = ? AND status = 'done'
+            """,
+            (user_id,),
+        ).fetchall()
+
+    total = 0
+    for row in rows:
+        copies = row["copies"] or 1
+        # If a custom page range exists, count only those pages
+        if row["pages"]:
+            try:
+                pages_list = extract_pages(row["pages"])
+                pages_count = len(pages_list)
+            except Exception:
+                # Fall back to stored page_count if parsing fails
+                pages_count = row["page_count"]
+        else:
+            pages_count = row["page_count"]
+        total += pages_count * copies
+    return total
+
+
+def _get_personal_discount(user_id: int) -> float:
+    """
+    Determine the appropriate personal discount percentage for a user
+    based on how many pages they have printed.  The PERSONAL_DISCOUNT_TIERS
+    dictionary defines thresholds and corresponding discount percentages.
+    The highest tier that the user has reached is returned.  If no tiers
+    are defined or the user hasn't met any threshold, 0.0 is returned.
+    """
+    if not PERSONAL_DISCOUNT_TIERS:
+        return 0.0
+    try:
+        total_pages = _calculate_user_total_pages_for_discount(user_id)
+    except Exception:
+        # In case of database issues, do not apply a personal discount
+        return 0.0
+    # Find the maximum tier threshold less than or equal to total_pages
+    eligible = [pct for pages, pct in PERSONAL_DISCOUNT_TIERS.items() if total_pages >= pages]
+    return max(eligible) if eligible else 0.0
 
 def get_user_discounts(user_id: int) -> tuple[int, float, str]:
     # бонусы из таблицы
@@ -74,6 +130,18 @@ def get_user_discounts(user_id: int) -> tuple[int, float, str]:
 
     discount_percent = float(best_disc[0])
     used_code = best_disc[1] or best_pages[1]
+
+    # Apply personal discount based on total pages printed.  This will override
+    # promo‑based discounts only if it is larger.  An empty PERSONAL_DISCOUNT_TIERS
+    # dictionary disables this feature completely.
+    try:
+        personal_discount = _get_personal_discount(user_id)
+        if personal_discount > discount_percent:
+            discount_percent = personal_discount
+    except Exception:
+        # Ignore errors when computing personal discounts
+        pass
+
     # Apply default discount from configuration if greater than existing discount
     try:
         if DISCOUNT_PERCENT > discount_percent:

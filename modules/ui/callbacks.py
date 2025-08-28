@@ -29,3 +29,7 @@ LAYOUTS = ["16", "9", "2", "1"]
 # Admin
 ADMIN_DISCOUNT = "discount"
 ADMIN_BONUS_PAGES = "bonus_pages"
+
+# Queue / status
+# Callback used for checking the current status of a queued or running print job.
+PRINT_STATUS = "print_status"

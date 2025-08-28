@@ -22,6 +22,12 @@ class PrintJob:
     pages: str = ""  # например "1,3-5"
     copies: int = 1
 
+    # ID of the Telegram message used to inform the user about this job's
+    # position in the print queue.  This is stored so that the bot can
+    # update the same message when the estimated wait time changes.  It
+    # remains None until a message has been sent.
+    message_id: int | None = None
+
     async def run(self):
         try:
             orientation_blocks = get_orientation_ranges(self.file_path)

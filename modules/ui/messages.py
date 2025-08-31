@@ -1,6 +1,6 @@
 # Messages for the Telegram bot
 MAIN_MENU_TEXT = """
-📤 Присылай .docx или .pdf — я напечатаю в комнате <b>1708А</b>
+📤 Присылай свой файл — я распечатаю его в комнате <b>1708А</b>
 
 🖨 ЧБ-печать — <b>20 коп/страница</b>  
 """
@@ -121,6 +121,13 @@ def format_print_text(data: dict) -> str:
 ✅ Файл <b>{data['file_name']}</b> обработан
 📄 Страниц: <b>{data['page_count']}</b>{price_block}
 """
+    if "group" in data["file_path"]:
+        header = f"""
+✅ Файлы <b>{data['file_name']}</b> обработаны
+📄 Страниц: <b>{data['page_count']}</b>{price_block}
+"""
+    
+
     options = []
     
     duplex = data.get("duplex", False)

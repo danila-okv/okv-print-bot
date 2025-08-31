@@ -10,6 +10,8 @@ from modules.analytics.logger import info, error
 from db import get_connection
 from modules.printing.pdf_utils import get_orientation_ranges
 
+from modules.analytics.supplies import consume_supply
+
 @dataclass
 class PrintJob:
     user_id: int
@@ -19,13 +21,9 @@ class PrintJob:
     page_count: int = 0
     duplex: bool = False
     layout: str = "1"
-    pages: str = ""  # например "1,3-5"
+    pages: str = "" 
     copies: int = 1
 
-    # ID of the Telegram message used to inform the user about this job's
-    # position in the print queue.  This is stored so that the bot can
-    # update the same message when the estimated wait time changes.  It
-    # remains None until a message has been sent.
     message_id: int | None = None
 
     async def run(self):
@@ -50,7 +48,7 @@ class PrintJob:
             if len(blocks) == 1:
                 block = blocks[0]
                 page_range_str = self.merge_page_list(block["pages"])
-                cmd = ["lp"]
+                cmd = ["lp", "-o", "media=A4", "-o", "fit-to-page"]
 
                 if self.layout:
                     cmd += ["-o", f"number-up={self.layout}"]
@@ -104,6 +102,9 @@ class PrintJob:
                     job_id = job_id_str.split("-")[1].split()[0]
                     self.save_to_db(status="queued", job_id=job_id)
                     job_ids.append(job_id)
+
+            await consume_supply("бумага", self.page_count * self.copies, bot=self.bot)
+            await consume_supply("чернила", self.page_count * self.copies, bot=self.bot)
 
             while True:
                 lpstat = subprocess.run(["lpstat", "-W", "not-completed"], capture_output=True, text=True)

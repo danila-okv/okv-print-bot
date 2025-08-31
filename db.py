@@ -118,9 +118,8 @@ def init_db():
         c.execute("""
         CREATE TABLE IF NOT EXISTS supplies (
             name        TEXT PRIMARY KEY,                   -- 'paper', 'ink'
-            quantity    REAL NOT NULL DEFAULT 0,
-            minimum     REAL NOT NULL DEFAULT 0,
-            unit        TEXT NOT NULL DEFAULT 'pcs',        -- ('pages','ml','pcs')
+            quantity    INTEGER NOT NULL DEFAULT 0,
+            minimum     INTEGER NOT NULL DEFAULT 0,
             updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """)

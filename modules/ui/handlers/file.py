@@ -14,7 +14,7 @@ from modules.billing.services.calculate_price import calculate_price
 from modules.billing.services.promo import get_user_discounts
 from ..keyboards.review import details_review_kb, free_review_kb
 from modules.admin.services.ban import is_banned
-from .main_menu import send_main_menu
+from .start import send_main_menu
 from states import UserStates
 from ..messages import *
 from modules.analytics.logger import action, warning, info, error

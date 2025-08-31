@@ -83,13 +83,13 @@ async def update_queue_messages() -> None:
             continue
         # Compute position: all jobs ahead plus current job if printing
         position = (1 if current_job else 0) + idx + 1
-        wait_seconds = compute_wait_time(job)
-        minutes = int(wait_seconds // 60)
-        seconds = int(wait_seconds % 60)
+        # Build a message showing only the queue position.  We intentionally
+        # omit any time estimates because they tend to be unreliable on
+        # consumer printers.  Users can still see their position relative
+        # to other jobs (including the one currently printing).
         text = (
             f"📄 Файл <b>{job.file_name}</b> поставлен в очередь на печать.\n"
-            f"Позиция в очереди: <b>{position}</b>\n"
-            f"⏱️ Примерное время ожидания: <b>{minutes} мин {seconds:02d} сек.</b>"
+            f"Позиция в очереди: <b>{position}</b>"
         )
         try:
             await job.bot.edit_message_text(
@@ -99,7 +99,8 @@ async def update_queue_messages() -> None:
                 reply_markup=print_status_kb,
                 parse_mode="HTML",
             )
-            info(job.user_id, "print_queue", f"Queue status updated for {job.file_name}, position {position}, wait {minutes}m {seconds}s")
+            # Log the updated position; wait times are no longer calculated
+            info(job.user_id, "print_queue", f"Queue status updated for {job.file_name}, position {position}")
         except Exception as e:
             # Silently ignore errors when updating messages (e.g. message deleted)
             error(job.user_id, "print_queue", f"Failed to update queue message: {e}")
@@ -120,21 +121,20 @@ async def _notify_job_added(job: PrintJob, ahead_jobs: int) -> None:
             msg = await send_managed_message(
                 job.bot,
                 job.user_id,
-                text=PRINT_START_TEXT.format(file_name=job.file_name),
-                reply_markup=print_status_kb,
+                text=PRINT_START_TEXT.format(file_name=job.file_name)
+                # reply_markup=print_status_kb,
             )
             job.message_id = msg.message_id
         else:
-            # Compute wait time based on current queue
-            wait_seconds = compute_wait_time(job)
+            # The job must wait for the current job and all jobs ahead.  We
+            # intentionally do not compute or display a time estimate; only
+            # the position in the queue is shown.  Position includes the
+            # currently printing job, if any.
             position = (1 if current_job else 0) + ahead_jobs + 1
-            minutes = int(wait_seconds // 60)
-            seconds = int(wait_seconds % 60)
             info(job.user_id, "queue", f"Job {job.file_name} queued at position {position}")
             text = (
                 f"📄 Файл <b>{job.file_name}</b> поставлен в очередь на печать.\n"
-                f"Позиция в очереди: <b>{position}</b>\n"
-                f"⏱️ Примерное время ожидания: <b>{minutes} мин {seconds:02d} сек.</b>"
+                f"Позиция в очереди: <b>{position}</b>"
             )
             msg = await send_managed_message(
                 job.bot,

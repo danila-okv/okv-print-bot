@@ -17,7 +17,7 @@ from datetime import datetime
 
 from modules.ui.callbacks import PRINT_STATUS
 from modules.ui.keyboards.status import print_status_kb
-from modules.printing.print_service import compute_wait_time, print_queue, current_job
+from modules.printing.print_service import print_queue, current_job
 from modules.analytics.logger import info, error
 
 router = Router()
@@ -60,18 +60,15 @@ async def handle_print_status(callback: CallbackQuery) -> None:
         else:
             await callback.answer()
         return
-    # Compute updated wait time and position
-    wait_seconds = compute_wait_time(target_job)
-    minutes = int(wait_seconds // 60)
-    seconds = int(wait_seconds % 60)
-    # Determine position including current job
+    # Determine position including any current job.  We intentionally
+    # omit time remaining from the status message because it can be
+    # misleading on consumer printers.
     ahead_count = (1 if current_job else 0) + list(print_queue).index(target_job)
     position = ahead_count + 1
     update_time = datetime.now().strftime("%H:%M:%S")
     text = (
         f"📄 Файл <b>{target_job.file_name}</b>\n"
         f"Позиция в очереди: <b>{position}</b>\n"
-        f"⏱️ Осталось: <b>{minutes} мин {seconds:02d} сек.</b>\n"
         f"Обновлено: {update_time}"
     )
     try:
@@ -80,7 +77,7 @@ async def handle_print_status(callback: CallbackQuery) -> None:
             reply_markup=print_status_kb,
             parse_mode="HTML",
         )
-        info(user_id, "print_status", f"Status updated: position {position}, wait {minutes}m {seconds}s")
+        info(user_id, "print_status", f"Status updated: position {position}")
     except Exception as e:
         error(user_id, "print_status", f"Failed to edit status message: {e}")
     await callback.answer()

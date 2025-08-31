@@ -56,18 +56,15 @@ def get_print_layouts_kb(selected_layout: str) -> InlineKeyboardMarkup:
             keyboard.append(row)
             row = []
 
-    # Добавляем последнюю неполную строку кнопок (если осталась одна)
     if row:
         keyboard.append(row)
         row = []
 
-    # Добавляем кнопку "Назад"
     back_button = InlineKeyboardButton(
         text=BUTTON_BACK,
         callback_data=BACK
     )
 
-    # Если последняя строка пустая — создаём новую строку, иначе — добавляем в текущую
     if not keyboard or len(keyboard[-1]) == 2:
         keyboard.append([back_button])
     else:

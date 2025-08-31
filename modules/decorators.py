@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from modules.ui.messages import ACCESS_DENIED_TEXT
-from modules.ui.handlers.main_menu import send_main_menu
+from modules.ui.handlers.start import send_main_menu
 from modules.ui.keyboards.tracker import send_managed_message
 from modules.analytics.logger import warning
 def check_paused(func):

@@ -17,8 +17,8 @@ def calculate_price(
 
     # Use configured price per page
     price_per_page = PRICE_PER_PAGE
-    raw_price = pages_to_pay * price_per_page
-    discounted_price = raw_price * (1 - discount_percent / 100)
+    raw_price = total_pages * price_per_page
+    discounted_price = pages_to_pay * price_per_page * (1 - discount_percent / 100)
 
     return {
         "total_pages": total_pages,

@@ -84,6 +84,8 @@ async def handle_option_duplex(callback: CallbackQuery, state: FSMContext, data:
 @ensure_data
 async def handle_option_layout(callback: CallbackQuery, state: FSMContext, data: dict):
     layout = data.get("layout", "1")
+    if layout not in LAYOUTS:
+        layout = "1"
     await callback.message.edit_text(
         text = get_layout_selection_text(data),
         reply_markup=get_print_layouts_kb(layout)
@@ -106,7 +108,7 @@ async def handle_layout_selection(callback: CallbackQuery, state: FSMContext, da
     bonus_pages, discount_percent, promo_code = get_user_discounts(callback.from_user.id)
 
     page_range = data.get("pages") or f"1-{data['page_count']}"
-    layout = int(data.get("layout"), "1")
+    layout = data.get("layout", "1")
     copies = data.get("copies", 1)
 
     price_data = calculate_price(
@@ -200,6 +202,11 @@ async def handle_copies_input(message: Message, state: FSMContext, data: dict):
 @check_paused
 @ensure_data
 async def handle_pages_selection(callback: CallbackQuery, state: FSMContext, data: dict):
+    if "group" in data.get("file_path"):
+        await callback.message.answer("❗️ Печать отдельных страниц в группе файлов пока что не поддерживается. Отправь их по отдельности или перешли мне - @danila_okv")
+        await callback.answer()
+        return
+
     await state.set_state(UserStates.inputting_pages)
 
     await callback.message.edit_text(

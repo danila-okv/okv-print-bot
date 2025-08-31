@@ -8,6 +8,17 @@ from .buttons import (
     BUTTON_PRINT_OPTIONS, BUTTON_PAY_CASH, BUTTON_PAY_CARD, BUTTON_CANCEL, BUTTON_PRINT
 )
 
+
+def review_kb(data: dict) -> InlineKeyboardMarkup:
+
+    price_data = data.get("price_data", {})
+    price = price_data.get("final_price", 0)
+
+    if price > 0:
+        return details_review_kb
+    else:
+        return free_review_kb
+
 details_review_kb = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text=BUTTON_PRINT_OPTIONS, callback_data=PRINT_OPTIONS)

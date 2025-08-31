@@ -3,11 +3,11 @@ from aiogram import Router
 # Note: When adding new UI handlers, import them here and include them in
 # the router chain. The profile handler is responsible for the profile menu
 # and order history.
-from .handlers import promo, cancel, confirm, fallback, file, main_menu, options, payment, back, profile, print_status
+from .handlers import promo, cancel, confirm, fallback, file, options, payment, back, profile, print_status, start
 
 router = Router()
 
-for module in (promo, cancel, file, main_menu, payment, options, confirm, back, fallback):
+for module in (promo, cancel, file, start, payment, options, confirm, back, fallback):
     router.include_router(module.router)
 
 # Include the print status handler.  It should be registered early so that

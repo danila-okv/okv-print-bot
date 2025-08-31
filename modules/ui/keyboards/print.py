@@ -11,8 +11,8 @@ print_done_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text=BUTTON_SUPPORT, url="https://t.me/danila_okv"),
-            InlineKeyboardButton(text=BUTTON_DONE, callback_data=DONE)
-        ]
+            InlineKeyboardButton(text=BUTTON_DONE, callback_data=DONE)     
+      ]
     ]
 )
 

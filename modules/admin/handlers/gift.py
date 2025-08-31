@@ -48,21 +48,6 @@ router = Router()
 @router.message(Command("gift"))
 @admin_only
 async def cmd_gift(message: Message, state: FSMContext):
-    """
-    Entry point for the /gift command.
-
-    Depending on how the command is invoked, this function will either:
-
-    * Expect a single user ID immediately after the command (legacy usage) and
-      proceed directly to the gift type selection; or
-    * Prompt the administrator to provide a comma‑ or newline‑separated list
-      of user IDs when no ID is supplied, or when a list of IDs is supplied
-      inline after the command.
-
-    The FSM state is always cleared at the beginning of this handler to avoid
-    interference from previous interactions.
-    """
-    # Reset any previous state to avoid confusion
     await state.clear()
 
     # Split the command into the command itself and the remainder

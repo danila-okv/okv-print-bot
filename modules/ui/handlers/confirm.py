@@ -5,7 +5,7 @@ from states import UserStates
 from modules.decorators import ensure_data
 from modules.decorators import check_paused
 from modules.analytics.logger import action, warning, error
-from ..keyboards.review import details_review_kb, free_review_kb
+from ..keyboards.review import review_kb
 from ..keyboards.payment import payment_methods_kb
 from ..keyboards.options import get_print_options_kb
 from ..messages import (
@@ -55,18 +55,14 @@ async def handle_confirm(callback: CallbackQuery, state: FSMContext, data: dict)
         data = await state.get_data()
 
         try:
-            # Выбираем клавиатуру в зависимости от цены
-            kb = free_review_kb if price_data.get("final_price", 0) == 0 else details_review_kb
-            # Обновляем метод: free, если цена нулевая
             if price_data.get("final_price", 0) == 0:
                 await state.update_data(method="free")
             else:
-                # Удаляем метод, если ранее был free и теперь цена положительная
                 await state.update_data(method=None)
 
             await callback.message.edit_text(
                 text=get_print_options_text(data),
-                reply_markup=kb
+                reply_markup=review_kb(data)
             )
         except TelegramBadRequest as e:
             await callback.message.answer(f"Ошибка при обновлении текста: {e}")
@@ -117,14 +113,13 @@ async def handle_confirm(callback: CallbackQuery, state: FSMContext, data: dict)
         data = await state.get_data()
 
         try:
-            kb = free_review_kb if price_data.get("final_price", 0) == 0 else details_review_kb
             if price_data.get("final_price", 0) == 0:
                 await state.update_data(method="free")
             else:
                 await state.update_data(method=None)
             await callback.message.edit_text(
                 text=get_print_options_text(data),
-                reply_markup=kb
+                reply_markup=review_kb(data)
             )
         except TelegramBadRequest as e:
             await callback.message.answer(f"Ошибка при обновлении текста: {e}")

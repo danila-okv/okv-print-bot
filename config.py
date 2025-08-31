@@ -182,13 +182,7 @@ ALLOWED_FILE_TYPES: list[str] = [
     ".webp",
 ]
 
-# Maximum size of an uploaded file in megabytes.  Files exceeding this limit
-# will be rejected by the upload handler.  A value of 0 disables this check.
 MAX_FILE_SIZE_MB: int = 20
-
-# Maximum number of pages allowed per print job.  If a document exceeds this
-# limit, the user will be asked to reduce the page range or split the job.  A
-# value of 0 disables this check.
 MAX_PAGES_PER_JOB: int = 100
 
 ###############################################################################

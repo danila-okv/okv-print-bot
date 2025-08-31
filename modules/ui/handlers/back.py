@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from states import UserStates
 from modules.decorators import ensure_data
 from modules.decorators import check_paused
-from ..keyboards.review import details_review_kb
+from ..keyboards.review import review_kb
 from ..keyboards.payment import payment_methods_kb
 from ..keyboards.options import get_print_options_kb
 from ..messages import *
@@ -16,7 +16,7 @@ router = Router()
 @router.callback_query(F.data == BACK)
 @check_paused
 @ensure_data
-async def handle_return(callback: CallbackQuery, state: FSMContext, data: dict):
+async def handle_back(callback: CallbackQuery, state: FSMContext, data: dict):
     current = await state.get_state()
 
     if current == UserStates.setting_print_options:
@@ -24,7 +24,7 @@ async def handle_return(callback: CallbackQuery, state: FSMContext, data: dict):
 
         await callback.message.edit_text(
             text=format_print_text(data),
-            reply_markup=details_review_kb
+            reply_markup=review_kb(data)
         )
         return await callback.answer()
     
@@ -45,7 +45,7 @@ async def handle_return(callback: CallbackQuery, state: FSMContext, data: dict):
 
         await callback.message.edit_text(
             text=get_details_review_text(data),
-            reply_markup=details_review_kb
+            reply_markup=review_kb(data)
         )
         return await callback.answer()
     
@@ -54,7 +54,7 @@ async def handle_return(callback: CallbackQuery, state: FSMContext, data: dict):
 
         await callback.message.edit_text(
             text=get_details_review_text(data),
-            reply_markup=details_review_kb
+            reply_markup=review_kb(data)
         )
         return await callback.answer()
     

@@ -5,6 +5,8 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 from typing import List, Dict
 from datetime import datetime, timedelta
 
+from datetime import datetime
+
 from modules.ui.keyboards.profile import profile_kb
 from modules.ui.keyboards.tracker import send_managed_message
 from modules.ui.callbacks import PROFILE, ORDERS, MAIN_MENU
@@ -182,32 +184,14 @@ async def handle_profile(callback: CallbackQuery) -> None:
     discount_lines.append(f"Прогресс: <code>[{bar}]</code>")
     discount_block = "\n".join(discount_lines)
 
-    # Collect active promos and format them
     promos = get_active_promos_for_user(user_id)
     promo_lines: List[str] = []
     for promo in promos:
-        code = promo["code"]
-        reward_type = promo["reward_type"]
-        reward_value = promo["reward_value"]
-        dur = promo.get("duration_days")
-        activated_at = promo.get("activated_at")
-        # Compute expiry date if duration is set
-        if dur is not None and activated_at:
-            try:
-                act_dt = datetime.fromisoformat(activated_at)
-            except Exception:
-                try:
-                    act_dt = datetime.strptime(activated_at, "%Y-%m-%d %H:%M:%S")
-                except Exception:
-                    act_dt = None
-            if act_dt:
-                expiry_dt = act_dt + timedelta(days=dur)
-                expiry_str = expiry_dt.strftime("%Y-%m-%d")
-            else:
-                expiry_str = ""
-        else:
-            # No duration specified — treat as perpetual
-            expiry_str = ""
+        code = promo.get("code")
+        reward_type = promo.get("reward_type")
+        reward_value = promo.get("reward_value")
+        expires_at = promo.get("expires_at")
+        
         if "GIFT" in code:
             code="Подарок"
 
@@ -216,21 +200,21 @@ async def handle_profile(callback: CallbackQuery) -> None:
         else:
             reward_text = f"{int(reward_value)}%"
 
-        if expiry_str:
-            promo_lines.append(f"• <b>{code}</b>: {reward_text}, до {expiry_str}")
+        if expires_at is not None: 
+            promo_lines.append(f"• <b>{code}</b>: {reward_text}, до {expires_at.strftime("%d.%m.%Y")}")
         else:
             promo_lines.append(f"• <b>{code}</b>: {reward_text}, навсегда")
-
-    promos_block = "\n".join(promo_lines) if promo_lines else "Нет"
+       
+    promos_block = "\n".join(promo_lines) if promo_lines else ""
 
     bonus_line = f"🎁 Бесплатных страниц: <b>{bonus_pages}</b>\n" if bonus_pages > 0 else ""
-    promo_line = f"🎟 <b>Активные промокоды:</b>\n{promos_block}" if promo_lines else ""
+    promo_line = f"🎟 <b>Активные промокоды:</b>\n{promos_block}\n\n" if promo_lines else ""
 
     profile_text = (
         "👤 <b>Твой профиль</b>\n\n"
         f"📄 Напечатано страниц: <b>{total_pages}</b>\n"
         f"{bonus_line}\n"
-        f"{promo_line}\n\n"
+        f"{promo_line}"
         f"{discount_block}"
     )
 

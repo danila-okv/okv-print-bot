@@ -8,6 +8,8 @@ from modules.billing.services.promo import (
     add_user_bonus_pages,
     get_promo_info,
 )
+from datetime import datetime
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from modules.ui.keyboards.tracker import send_managed_message
 
 router = Router()
@@ -67,7 +69,7 @@ async def handle_promo_code_input(message: Message):
             expiry_str = ""
 
         try:
-            text = message_template.format(value=value_str, date=expiry_str)
+            text = message_template.format(value=value_str, date=expires_at.strftime("%d.%m.%Y"))
         except Exception:
             # Если форматирование не удалось — отправим шаблон как есть
             text = message_template
@@ -84,8 +86,20 @@ async def handle_promo_code_input(message: Message):
                 f"Ты получил скидку <b>{int(reward_value)}%</b>"
             )
 
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Понятно, спасибо!",
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
+
     await send_managed_message(
         bot=message.bot,
         user_id=user_id,
-        text=text
+        text=text,
+        reply_markup=kb
     )

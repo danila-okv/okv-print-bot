@@ -1,8 +1,10 @@
+from config import PRICE_PER_PAGE
+
 # Messages for the Telegram bot
-MAIN_MENU_TEXT = """
+MAIN_MENU_TEXT = f"""
 📤 Присылай свой файл — я распечатаю его в комнате <b>1708А</b>
 
-🖨 ЧБ-печать — <b>20 коп/страница</b>  
+🖨 ЧБ-печать — <b>{int(PRICE_PER_PAGE*100)} коп/страница</b>  
 """
 UNKNOWN_COMMAND_TEXT = "❓ Я пока что не выучил такой команды. Напиши /start, чтобы вызвать главное меню"
 ACCESS_DENIED_TEXT = "🚫 Отсутствует доступ"
@@ -66,7 +68,7 @@ PRINT_COPIES_INPUT_TEXT = """
 PRINT_DONE_TEXT = """✅ Готово!\n Можешь забрать свой файл в комнате <b>1708А</b> (2-я секция)
 Заходи без стука
 """
-PRINT_CANCELLED_TEXT = "❌ Печать отменена. Если что-то не так, пиши в поддержку"
+PRINT_CANCELLED_TEXT = "❌ Печать отменена. Если что-то не так, пиши - @danila_okv"
 
 def get_details_review_text(data: dict) -> str:
     header = format_print_text(data)
@@ -113,7 +115,7 @@ def format_print_text(data: dict) -> str:
     price_block = f"\n💰 К оплате: <s>{price.get('raw_price', 0):.2f}</s> → <b>{price.get('final_price', 0):.2f} руб.</b>"
 
     if price.get("discount_applied", 0):
-        price_block += f" (скидка {price['discount_applied']}%)"
+        price_block += f" (скидка {price['discount_applied']:.0f}%)"
     if price.get("pages_covered_by_bonus", 0):
         price_block += f"\n🎁 Использовано бесплатных страниц: {price['pages_covered_by_bonus']}"
 

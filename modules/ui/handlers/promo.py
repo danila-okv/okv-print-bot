@@ -8,6 +8,9 @@ from modules.billing.services.promo import (
     add_user_bonus_pages,
     get_promo_info,
 )
+from datetime import datetime
+from ..messages import UNKNOWN_COMMAND_TEXT
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from modules.ui.keyboards.tracker import send_managed_message
 
 router = Router()
@@ -17,6 +20,11 @@ async def handle_promo_code_input(message: Message):
     code = message.text.strip()
 
     if not promo_exists(code):
+        await send_managed_message(
+            bot=message.bot,
+            user_id=message.from_user.id,
+            text=UNKNOWN_COMMAND_TEXT
+        )
         return  # Просто пропускаем — пусть другие обработчики ловят как обычный текст
 
     user_id = message.from_user.id
@@ -32,6 +40,11 @@ async def handle_promo_code_input(message: Message):
     # Получаем полную информацию о промокоде, включая шаблон сообщения и срок действия
     info_data = get_promo_info(code)
     if not info_data:
+        await send_managed_message(
+            bot=message.bot,
+            user_id=message.from_user.id,
+            text=UNKNOWN_COMMAND_TEXT
+        )
         return
 
     reward_type = info_data["reward_type"]
@@ -40,10 +53,8 @@ async def handle_promo_code_input(message: Message):
     message_template = info_data.get("message_template")
     expires_at = info_data.get("expires_at")
 
-    # Фиксируем активацию промокода
     record_promo_activation(user_id, code)
 
-    # Применяем бонусные страницы при необходимости
     if reward_type == "pages":
         add_user_bonus_pages(user_id, int(reward_value))
 
@@ -67,7 +78,7 @@ async def handle_promo_code_input(message: Message):
             expiry_str = ""
 
         try:
-            text = message_template.format(value=value_str, date=expiry_str)
+            text = message_template.format(value=value_str, date=expires_at.strftime("%d.%m.%Y"))
         except Exception:
             # Если форматирование не удалось — отправим шаблон как есть
             text = message_template
@@ -84,8 +95,20 @@ async def handle_promo_code_input(message: Message):
                 f"Ты получил скидку <b>{int(reward_value)}%</b>"
             )
 
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Понятно, спасибо!",
+                    callback_data="main_menu"
+                )
+            ]
+        ]
+    )
+
     await send_managed_message(
         bot=message.bot,
         user_id=user_id,
-        text=text
+        text=text,
+        reply_markup=kb
     )

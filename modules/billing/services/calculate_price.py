@@ -27,5 +27,5 @@ def calculate_price(
         "price_per_page": price_per_page,
         "raw_price": raw_price,
         "final_price": round(discounted_price, 2),
-        "discount_applied": discount_percent
+        "discount_applied": discount_percent if pages_to_pay > 0 else 0.0
     }

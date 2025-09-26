@@ -25,22 +25,15 @@ def get_active_promos_for_user(user_id: int) -> list[dict]:
         for row in rows:
             # Check per‑activation duration: if duration_days is not null, ensure still valid
             dur = row["duration_days"]
-            if dur is not None:
-                # Compute expiry for this activation
-                # activated_at is stored as ISO timestamp
-                try:
-                    act_time = datetime.fromisoformat(row["activated_at"])
-                except Exception:
-                    act_time = datetime.strptime(row["activated_at"], "%Y-%m-%d %H:%M:%S")
-                expiry = act_time + timedelta(days=dur)
-                if expiry <= datetime.now():
-                    continue
+            expires_at = row["activated_at"] + timedelta(days=dur) if dur is not None else None
+
             result.append({
                 "code": row["code"],
                 "reward_type": row["reward_type"],
                 "reward_value": row["reward_value"],
                 "duration_days": row["duration_days"],
                 "activated_at": row["activated_at"],
+                "expires_at": expires_at
             })
     return result
 

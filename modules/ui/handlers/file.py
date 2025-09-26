@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from modules.printing.pdf_utils import (
+from utils.pdf_utils import (
     get_page_count,
     is_supported_file,
     convert_docx_to_pdf,

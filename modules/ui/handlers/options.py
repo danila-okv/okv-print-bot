@@ -8,7 +8,7 @@ from states import UserStates
 from ..keyboards.common import back_kb
 from ..keyboards.options import get_print_options_kb, get_print_layouts_kb, confirm_kb
 from ..keyboards.tracker import send_managed_message
-from modules.printing.pdf_utils import get_orientation_ranges
+from utils.pdf_utils import get_orientation_ranges
 from modules.analytics.logger import action, warning, error, info
 from modules.billing.services.calculate_price import calculate_price
 from modules.billing.services.promo import get_user_discounts

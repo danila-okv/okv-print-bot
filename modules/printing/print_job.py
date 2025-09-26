@@ -8,7 +8,7 @@ from modules.ui.keyboards.print import print_done_kb, print_error_kb
 from modules.ui.keyboards.tracker import send_managed_message
 from modules.analytics.logger import info, error
 from db import get_connection
-from modules.printing.pdf_utils import get_orientation_ranges
+from utils.pdf_utils import get_orientation_ranges
 
 from modules.analytics.supplies import consume_supply
 

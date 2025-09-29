@@ -140,7 +140,7 @@ async def process_media_group(user_id: int, group_id: str) -> None:
                     max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
                     if doc.file_size > max_bytes:
                         await handle_failure(
-                            f"📎 Файл '{doc.file_name}' слишком большой. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
+                            f"� Файл '{doc.file_name}' слишком большой. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
                         )
                         break
 
@@ -196,7 +196,7 @@ async def process_media_group(user_id: int, group_id: str) -> None:
                     max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
                     if file_size > max_bytes:
                         await handle_failure(
-                            f"📎 Изображение слишком большое. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
+                            f"� Изображение слишком большое. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
                         )
                         break
                 # Compose a unique name for the photo
@@ -348,7 +348,7 @@ async def handle_document(message: Message, state: FSMContext):
         max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
         if doc.file_size > max_bytes:
             await message.answer(
-                f"📎 Файл слишком большой. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
+                f"� Файл слишком большой. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
             )
             warning(
                 message.from_user.id,
@@ -358,7 +358,7 @@ async def handle_document(message: Message, state: FSMContext):
             return
 
     if is_banned(user_id):
-        await message.answer("🚫 Вы были заблокированы. Обратитесь к администратору.")
+        await message.answer("� Вы были заблокированы. Обратитесь к администратору.")
         warning(
         message.from_user.id, 
         "document_upload", 
@@ -421,16 +421,8 @@ async def handle_document(message: Message, state: FSMContext):
         # Determine how to process the uploaded file based on its extension.
         if ext == ".docx":
             # Convert DOCX to PDF
-            temp_pdf = await convert_docx_to_pdf(uploaded_file_path)
-            info(
-                user_id,
-                "handle_document",
-                f"Converted DOCX to PDF: {temp_pdf}"
-            )
-            pdf_file_name = os.path.splitext(original_file_name)[0] + ".pdf"
-            final_pdf_path = os.path.join(user_folder, pdf_file_name)
-            os.replace(temp_pdf, final_pdf_path)
-            processed_pdf_path = final_pdf_path
+            processed_pdf_path = await convert_docx_to_pdf(uploaded_file_path)
+           
         elif ext in {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff", ".webp"}:
             # Convert image to PDF
             temp_pdf = await convert_image_to_pdf(uploaded_file_path)
@@ -558,7 +550,7 @@ async def handle_photo(message: Message, state: FSMContext):
         max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
         if file_size > max_bytes:
             await message.answer(
-                f"📎 Изображение слишком большое. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
+                f"� Изображение слишком большое. Максимальный размер — {MAX_FILE_SIZE_MB} МБ."
             )
             warning(
                 user_id,
@@ -569,7 +561,7 @@ async def handle_photo(message: Message, state: FSMContext):
 
     # Check if user is banned
     if is_banned(user_id):
-        await message.answer("🚫 Вы были заблокированы. Обратитесь к администратору.")
+        await message.answer("� Вы были заблокированы. Обратитесь к администратору.")
         warning(
             user_id,
             "photo_upload",

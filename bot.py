@@ -11,6 +11,11 @@ from modules.analytics import analytics
 from modules.ui.router import router as ui_router
 from modules.admin.router import router as admin_router
 
+from utils.word_utils import init_word, close_word
+import atexit
+
+init_word()
+atexit.register(close_word)
 from db import init_db
 
 if __name__ == "__main__":
@@ -21,7 +26,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 async def main():
     logging.basicConfig(level=logging.INFO)
-
     bot = Bot(
         token=BOT_TOKEN,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)

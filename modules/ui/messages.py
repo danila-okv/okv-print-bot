@@ -1,4 +1,5 @@
 from config import PRICE_PER_PAGE
+from config import ALLOWED_DOCUMENT_TYPES, ALLOWED_IMAGE_TYPES
 
 # Messages for the Telegram bot
 MAIN_MENU_TEXT = f"""
@@ -12,7 +13,13 @@ ACCESS_DENIED_TEXT = "🚫 Отсутствует доступ"
 
 # File processing messages
 FILE_PROCESSING_TEXT = "🔄 Файл <b>{file_name}</b> получил. Считаю страницы..."
-FILE_TYPE_ERROR_TEXT = "⚠️ Ух, пока что работаю только с .pdf и .docx"
+FILE_TYPE_ERROR_TEXT = (
+"⚠️ Ух, пока что не перевариваю файлы <b>{ext}</b>\n\n"
+f"Работаю <b>с документами</b>: {", ".join(ALLOWED_DOCUMENT_TYPES)}\n"
+f"и <b>изображениями</b>: {", ".join(ALLOWED_IMAGE_TYPES)}\n\n"
+"🎁 Перешли его мне, распечатаю <b>со скидкой 25%</b> — @danila_okv"
+)
+
 FILE_PROCESSING_FAILURE_TEXT = "❌ Что-то пошло не так с файлом <b>{file_name}</b>. Попробуй ещё раз или пришли другой"
 
 # Payment messages

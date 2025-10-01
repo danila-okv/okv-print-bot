@@ -172,10 +172,14 @@ DISCOUNT_PERCENT: float = 0.0
 # List of allowed file extensions (lower‑case, with leading dot) that users may
 # upload for printing.  Include both documents and images.  Modify this list
 # to permit additional formats.  The pdf_utils module reads this value.
-ALLOWED_FILE_TYPES: list[str] = [
+
+ALLOWED_DOCUMENT_TYPES: list[str] = [
     ".pdf",
     ".docx",
     ".doc",
+]
+
+ALLOWED_IMAGE_TYPES: list[str] = [
     ".jpg",
     ".jpeg",
     ".png",
@@ -185,6 +189,8 @@ ALLOWED_FILE_TYPES: list[str] = [
     ".tiff",
     ".webp",
 ]
+
+ALLOWED_FILE_TYPES: list[str] = ALLOWED_DOCUMENT_TYPES + ALLOWED_IMAGE_TYPES
 
 MAX_FILE_SIZE_MB: int = 20
 MAX_PAGES_PER_JOB: int = 100

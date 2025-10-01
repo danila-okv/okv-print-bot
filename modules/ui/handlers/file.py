@@ -365,9 +365,9 @@ async def handle_document(message: Message, state: FSMContext):
         "Banned user: Access denied"
         )
         return
-
     if not is_supported_file(original_file_name):
-        await message.answer(FILE_TYPE_ERROR_TEXT)
+        _, ext = os.path.splitext(original_file_name)
+        await message.answer(FILE_TYPE_ERROR_TEXT.format(ext=ext))
         warning(
         message.from_user.id, 
         "handle_document", 

@@ -175,6 +175,7 @@ DISCOUNT_PERCENT: float = 0.0
 ALLOWED_FILE_TYPES: list[str] = [
     ".pdf",
     ".docx",
+    ".doc",
     ".jpg",
     ".jpeg",
     ".png",

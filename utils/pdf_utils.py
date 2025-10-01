@@ -118,7 +118,7 @@ async def get_page_count(file_path: str) -> tuple[int, str]:
     if ext == ".pdf":
         return count_pdf_pages(file_path), file_path
 
-    if ext == ".docx":
+    if ext in {".docx", ".doc"}:
         pdf_path = await convert_docx_to_pdf(file_path)
         return count_pdf_pages(pdf_path), pdf_path
 

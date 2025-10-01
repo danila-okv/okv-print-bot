@@ -16,6 +16,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+DEFAULT_PRINTER_NAME = "Pantum_P3010DW"
 ###############################################################################
 # Basic bot configuration
 ###############################################################################
@@ -33,6 +34,7 @@ ADMIN_IDS: set[int] = {7676096317}
 # automatically when first accessed.  You can change this filename if you wish
 # to store the database in a different location within the project root.
 DB_FILE_NAME: str = "bot.db"
+SUMATRA_FILE_NAME: str = "SumatraPDF-3.5.2-64.exe"
 
 ###############################################################################
 # File system paths
@@ -52,6 +54,7 @@ DATA_DIR: Path = _BASE_DIR / "data"
 UPLOAD_DIR: Path = DATA_DIR / "uploads"
 TMP_DIR: Path = DATA_DIR / "tmp"
 DEBUG_DIR: Path = DATA_DIR / "debug"
+TOOLS_DIR: Path = _BASE_DIR / "tools"
 
 # Directory for log files.  Each log file is named according to the
 # current date (YYYY‑MM‑DD.log).  See modules/analytics/logger.py for
@@ -191,6 +194,7 @@ MAX_PAGES_PER_JOB: int = 100
 
 # Derived database path relative to the base directory
 DB_PATH: Path = _BASE_DIR / DB_FILE_NAME
+SUMATRA_PATH: Path = TOOLS_DIR / SUMATRA_FILE_NAME
 
 # Convenience string versions of some paths for legacy code.  Older modules
 # in the project expect plain strings rather than Path objects.  You can
@@ -200,6 +204,7 @@ TMP_DIR_STR: str = str(TMP_DIR)
 LOG_DIR_STR: str = str(LOG_DIR)
 DEBUG_PRINT_FILE_PATH_STR: str = str(DEBUG_PRINT_FILE_PATH)
 BACKUP_PATH_STR: str = str(BACKUP_PATH)
+SUMATRA_PATH_STR: str = str(SUMATRA_PATH)
 
 __all__ = [
     # fundamental values

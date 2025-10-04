@@ -52,7 +52,7 @@ def print_pdf_win(
     fit: bool = True,                     # fit-to-page
     paper: str = "A4",
     silent: bool = True,
-    wait: bool = False,                   # дождаться завершения (ждём пропадания job из очереди)
+    wait: bool = False,                   
     wait_timeout_s: int = 300
 ) -> None:
     """
@@ -71,31 +71,23 @@ def print_pdf_win(
 
     # настройки печати
     settings = []
+    if page_ranges:
+        pages_str = _merge_pages_for_sumatra(page_ranges)
+        settings.append(pages_str)
+    
     if duplex:
-        settings.append("duplex")  # long-edge по умолчанию
-        # для короткого края: settings.append("duplex,short-edge")
+        settings.append("duplex")
     if fit:
         settings.append("fit")
     if paper:
         settings.append(f"paper={paper}")
-    if number_up and number_up > 1:
-        settings.append(f"n-up={number_up}")
-
-    if settings:
-        args += ["-print-settings", ";".join(settings)]
-
-    # страницы (Sumatra понимает 1,2,4-6)
-    if page_ranges:
-        pages_str = _merge_pages_for_sumatra(page_ranges)  # "1,2,4-6"
-        args += ["-print-pages", pages_str]
-
-    # копии
     if copies and copies > 1:
-        args += ["-print-settings", f"copies={copies}"]
+        settings.append(f"{copies}x")
+    if settings:
+        args += ["-print-settings", ",".join(settings)]
 
     if silent:
-        args.append("-silent")
-
+        args.append("-print-dialog")
     # ориентирование: для PDF это лучше задавать в driver, но можно попробовать "/orientation" нельзя — Sumatra не имеет явного флага
     # Обычно ориентация берётся из PDF-страницы, а не принудительно.
 
@@ -106,7 +98,7 @@ def print_pdf_win(
     # подавим окно:
     creationflags = 0x08000000  # CREATE_NO_WINDOW
     proc = subprocess.Popen(args, creationflags=creationflags)
-
+    print(f"Print command: {args}")
     if wait:
         # Сопоставим job по имени документа: у Sumatra документ обычно = имя файла
         _wait_for_job_disappear(doc_name=os.path.basename(pdf_path),

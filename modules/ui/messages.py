@@ -112,7 +112,10 @@ def get_other_payment_text(data: dict) -> str:
 
 def format_print_text(data: dict) -> str:
     price = data.get("price_data", {})
-    price_block = f"\n💰 К оплате: <s>{price.get('raw_price', 0):.2f}</s> → <b>{price.get('final_price', 0):.2f} руб.</b>"
+    if price.get('raw_price', 0) == price.get('final_price', 0):
+        price_block = f"\n💰 К оплате: <b>{price.get('final_price', 0):.2f} руб.</b>"
+    else:
+        price_block = f"\n💰 К оплате: <s>{price.get('raw_price', 0):.2f}</s> → <b>{price.get('final_price', 0):.2f} руб.</b>"
 
     if price.get("discount_applied", 0):
         price_block += f" (скидка {price['discount_applied']:.0f}%)"

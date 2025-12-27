@@ -1,4 +1,4 @@
-from config import PRICE_PER_PAGE
+from config import PRICE_PER_PAGE, CONTACT_USERNAME
 
 # Messages for the Telegram bot
 MAIN_MENU_TEXT = f"""
@@ -30,7 +30,7 @@ PAY_ALFA_TEXT = """
 PAY_BELARUSBANK_TEXT = """
 💵 <b>Беларусбанк</b>  
 Платежи → Перевод по номеру телефона
-+375 (29) 277-07-03
+<code>375257270703</code> (нажми, чтобы скопировать)
 """
 PAY_OTHER_TEXT = """ 
 💵 Переводи через ЕРИП чбез комиссии:
@@ -64,11 +64,11 @@ PRINT_PAGES_INPUT_TEXT = """
 """
 PRINT_COPIES_INPUT_TEXT = """
 🔄 Введи количество копий (по умолчанию 1)
-"""
+""" 
 PRINT_DONE_TEXT = """✅ Готово!\n Можешь забрать свой файл в комнате <b>1708А</b> (2-я секция)
 Заходи без стука
 """
-PRINT_CANCELLED_TEXT = "❌ Печать отменена. Если что-то не так, пиши - @danila_okv"
+PRINT_CANCELLED_TEXT = f"❌ Печать отменена. Если что-то не так, пиши - @{CONTACT_USERNAME}"
 
 def get_details_review_text(data: dict) -> str:
     header = format_print_text(data)

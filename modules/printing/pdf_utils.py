@@ -85,7 +85,7 @@ async def get_page_count(file_path: str) -> tuple[int, str]:
 
     if ext == ".pdf":
         return count_pdf_pages(file_path), file_path
-    elif ext == ".docx":
+    elif ext in {".docx"}:
         # Convert DOCX to PDF and count pages
         try:
             pdf_path = await convert_docx_to_pdf(file_path)
@@ -94,7 +94,7 @@ async def get_page_count(file_path: str) -> tuple[int, str]:
         finally:
             # Remove temporary files used for conversion
             tmp_dir = TMP_DIR_STR
-            for tmp_file in ["convert.docx", "converted.pdf"]:
+            for tmp_file in [f"convert{ext}", "converted.pdf"]:
                 tmp_path = os.path.join(tmp_dir, tmp_file)
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)

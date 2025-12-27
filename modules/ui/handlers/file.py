@@ -160,7 +160,7 @@ async def process_media_group(user_id: int, group_id: str) -> None:
                 # Determine processing based on extension
                 _, ext = os.path.splitext(original_file_name)
                 ext = ext.lower()
-                if ext == ".docx":
+                if ext in {".docx"}:
                     temp_pdf = await convert_docx_to_pdf(uploaded_file_path)
                     pdf_file_name = os.path.splitext(original_file_name)[0] + ".pdf"
                     final_pdf_path = os.path.join(user_folder, pdf_file_name)
@@ -419,7 +419,7 @@ async def handle_document(message: Message, state: FSMContext):
         ext = ext.lower()
 
         # Determine how to process the uploaded file based on its extension.
-        if ext == ".docx":
+        if ext in {".docx"}:
             # Convert DOCX to PDF
             temp_pdf = await convert_docx_to_pdf(uploaded_file_path)
             info(

@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
+from config import CONTACT_USERNAME
 from modules.decorators import ensure_data
 from states import UserStates
 from ..keyboards.common import back_kb
@@ -203,7 +204,7 @@ async def handle_copies_input(message: Message, state: FSMContext, data: dict):
 @ensure_data
 async def handle_pages_selection(callback: CallbackQuery, state: FSMContext, data: dict):
     if "group" in data.get("file_path"):
-        await callback.message.answer("❗️ Печать отдельных страниц в группе файлов пока что не поддерживается. Отправь их по отдельности или перешли мне - @danila_okv")
+        await callback.message.answer(f"❗️ Печать отдельных страниц в группе файлов пока что не поддерживается. Отправь их по отдельности или перешли мне - @{CONTACT_USERNAME}")
         await callback.answer()
         return
 
